@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { parallelLimit } = require('async');
 const cheerio = require('cheerio');
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
 
@@ -104,11 +104,12 @@ async function createArchive(productsData) {
     const dataJson = JSON.stringify(productData, null, 2);
     archive.append(dataJson, { name: `${productDir}/data.json` });
 
-    for (const imgUrl of productData.gallery) {
+    const async_queue = productData.gallery.map((imgUrl) => async () => {
       const imgName = path.basename(imgUrl);
-      const response = await axios.get(imgUrl, { responseType: 'arraybuffer' });
+      const response = await axios.get(imgUrl, { responseType: 'arraybuffer' }).catch((err) => console.error('Image error:', err.message));
       archive.append(response.data, { name: `${productDir}/gallery/${imgName}` });
-    }
+    });
+    await parallelLimit(async_queue, 5);
   }
 
   await archive.finalize();
@@ -131,10 +132,6 @@ async function main() {
 
   await createArchive(productsData);
   console.info('Process completed');
-  process.exit(0);
 }
 
-main().catch((err) => {
-  console.error(`ERROR: ${err.message || err}`);
-  process.exit(1);
-});
+main()

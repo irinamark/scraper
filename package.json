@@ -1,0 +1,19 @@
+{
+  "name": "scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scraper.js",
+  "scripts": {
+    "scrape-products": "node scraper.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "async": "^3.2.5",
+    "axios": "^1.7.2",
+    "cheerio": "^1.0.0-rc.12",
+    "fs-extra": "^11.2.0"
+  }
+}
